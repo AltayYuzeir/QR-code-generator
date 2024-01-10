@@ -14,7 +14,7 @@ def resize_for_condition_image(input_image: Image.Image, resolution: int):
     return img
 
 
-def build_string_vcard(name, surname, phone, email, company, position, city, country):
+def build_string_vcard(name, surname, phone, email,website, position, company, city, state, country):
     result = "BEGIN:VCARD\nVERSION:3.0\n"
 
     if name is not None and name != "":
@@ -31,17 +31,25 @@ def build_string_vcard(name, surname, phone, email, company, position, city, cou
     if email is not None and email != "":
         result += f"EMAIL;WORK;INTERNET: {email}\n"
         
+    if website is not None and website != "":
+        result += f"URL: {website}\n"
+        
     if company is not None and company != "":
         result += f"ORG: {company}\n"
-
+    
     if position is not None and position != "":
         result += f"TITLE: {position}\n"
     
+    result += f"ADR:;"
+    
     if city is not None and city != "":
-        result += f"ADR:;; {city}"
+        result += f";{city}"
+        
+    if state is not None and state != "":
+        result += f";{state}"
 
     if country is not None and country != "":
-        result += f" {country}\n"    
+        result += f";{country}\n"    
     else:
         result += f"\n"
         
@@ -127,7 +135,7 @@ def email_qr_code(email,subject,message, size):
     qrcode_image = resize_for_condition_image(qrcode_image, size)
     return qrcode_image
 
-def vcard_qr_code(name, surname, phone, email, company, position, city, country, size):
+def vcard_qr_code(name, surname, phone, email,website, position, company, city, state, country, size):
     qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -135,7 +143,7 @@ def vcard_qr_code(name, surname, phone, email, company, position, city, country,
                 border=4,
             )
     
-    text = build_string_vcard(name, surname, phone, email, company, position, city, country)
+    text = build_string_vcard(name, surname, phone, email,website, position, company, city, state, country,)
     
     qr.add_data(text)
     qr.make(fit=True)
@@ -148,7 +156,7 @@ with gr.Blocks(title="QR code generator", css="footer {visibility: hidden}") as 
     
     with gr.Row():
         with gr.Tab("🌐 URL"):
-            url_text = gr.Textbox(label="Website (URL)")
+            url_text = gr.Textbox(label="Website (URL)", value="https://www.instagram.com/qrcodecustoms")
             url_size = gr.Slider(label = "Height and Width", minimum=768, maximum=2048, value=768, step=1)
             url_button = gr.Button("▶️ Run")
         
@@ -184,13 +192,17 @@ with gr.Blocks(title="QR code generator", css="footer {visibility: hidden}") as 
             with gr.Row():
                 vcard_phone = gr.Textbox(label="Phone number")
                 vcard_email = gr.Textbox(label="Email")
-            
+                
             with gr.Row():
-                vcard_company = gr.Textbox(label="Company")
+                vcard_website = gr.Textbox(label="Website")
                 vcard_position = gr.Textbox(label="Job position")
             
             with gr.Row():
+                vcard_company = gr.Textbox(label="Company")
                 vcard_city = gr.Textbox(label="City")
+            
+            with gr.Row():
+                vcard_state = gr.Textbox(label="State/Region/Province")
                 vcard_country = gr.Textbox(label="Country")
             
             vcard_size = gr.Slider(label = "Height and Width", minimum=768, maximum=2048, value=768, step=1)
@@ -217,8 +229,8 @@ with gr.Blocks(title="QR code generator", css="footer {visibility: hidden}") as 
                            outputs=[output_image])
         
         vcard_button.click(fn=vcard_qr_code,
-                           inputs=[vcard_name, vcard_surname, vcard_phone, vcard_email,
-                                   vcard_company, vcard_position, vcard_city, vcard_country, vcard_size],
+                           inputs=[vcard_name, vcard_surname, vcard_phone, vcard_email, vcard_website,
+                                    vcard_position, vcard_company,vcard_city, vcard_state, vcard_country, vcard_size],
                            outputs=[output_image])
     
 app.launch()
