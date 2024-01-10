@@ -148,7 +148,7 @@ with gr.Blocks(title="QR code generator", css="footer {visibility: hidden}") as 
     
     with gr.Row():
         with gr.Tab("🌐 URL"):
-            url_text = gr.Textbox(label="Website (URL)", value="https://www.instagram.com/qrcodecustoms")
+            url_text = gr.Textbox(label="Website (URL)")
             url_size = gr.Slider(label = "Height and Width", minimum=768, maximum=2048, value=768, step=1)
             url_button = gr.Button("▶️ Run")
         
